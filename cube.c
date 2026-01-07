@@ -105,9 +105,24 @@ static void cleanupConsole() {
     SetConsoleMode(hStdin, stdinMode);
 }
 #else
-// Unix/Linux用の空の関数
-static void initConsole() {}
-static void cleanupConsole() {}
+// Unix/Linux用の端末設定
+static struct termios original_termios;
+static int termios_set = 0;
+
+// 端末を初期化する関数
+static void initConsole() {
+    if (tcgetattr(STDIN_FILENO, &original_termios) == 0) {
+        termios_set = 1;
+    }
+}
+
+// 端末設定を復元する関数
+static void cleanupConsole() {
+    if (termios_set) {
+        tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
+        termios_set = 0;
+    }
+}
 #endif
 
 // レンダラーを作成する関数
@@ -122,7 +137,7 @@ static CubeRenderer* createRenderer(int width, int height) {
     
     // 各バッファのメモリを確保
     renderer->zBuffer = calloc(width * height, sizeof(float));           // Zバッファ
-    renderer->buffer = malloc(width * height + height + 100);           // 描画バッファ（余裕を持たせる）
+    renderer->buffer = malloc(width * height * 10 + height + 200);        // 描画バッファ（色コード分を考慮して大きく確保）
     renderer->colorBuffer = calloc(width * height, sizeof(const char*)); // 色バッファ
     
     // メモリ確保のエラーチェック
@@ -156,6 +171,9 @@ static void destroyRenderer(CubeRenderer* renderer) {
         free(renderer->zBuffer);      // Zバッファを解放
         free(renderer->buffer);        // 描画バッファを解放
         free(renderer->colorBuffer);   // 色バッファを解放
+        renderer->zBuffer = NULL;
+        renderer->buffer = NULL;
+        renderer->colorBuffer = NULL;
         free(renderer);               // レンダラー構造体を解放
     }
 }
@@ -290,8 +308,9 @@ static void render(CubeRenderer* renderer) {
         }
         
         const char* color = renderer->colorBuffer[k];
+        int hasColor = *color != '\0';  // 色コードがあるかチェック
         // 色コードがある場合は設定
-        if (*color) {
+        if (hasColor) {
             while (*color) {
                 *outputPtr++ = *color++;
             }
@@ -301,7 +320,7 @@ static void render(CubeRenderer* renderer) {
         *outputPtr++ = renderer->buffer[k];
         
         // 色コードがあった場合はリセット
-        if (*color) {
+        if (hasColor) {
             *outputPtr++ = '\x1b';
             *outputPtr++ = '[';
             *outputPtr++ = '0';
@@ -421,6 +440,9 @@ int main() {
     
     // 後処理
     destroyRenderer(renderer);  // レンダラーを破棄
+    
+    // 色と画面をリセット
+    printf("\x1b[0m");          // 色をリセット
     printf("\x1b[2J");          // 画面をクリア
     printf("\x1b[H");            // カーソルを左上に
     fflush(stdout);
