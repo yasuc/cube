@@ -21,8 +21,8 @@ ifeq ($(DETECTED_OS),Windows)
     CFLAGS = -Wall -Wextra -O2 -std=c99
     LDFLAGS = -lm
     TARGET_EXT = .exe
-    RM = del /Q
-    MKDIR = mkdir
+    RM = rm -f
+    MKDIR = mkdir -p
 else ifeq ($(UNAME_S),Darwin)
     # macOS
     CC = clang
