@@ -2,6 +2,12 @@
 
 #define _GNU_SOURCE             // GNU拡張を有効化（usleepのプロトタイプ宣言用）
 
+// 標準ライブラリ（すべてのプラットフォームで共通）
+#include <math.h>      // 数学関数（sin, cosなど）
+#include <stdio.h>     // 標準入出力
+#include <string.h>    // 文字列操作
+#include <stdlib.h>    // メモリ管理
+
 // プラットフォーム固有のヘッダー
 #ifdef _WIN32
 #include <windows.h>   // Windows API
@@ -16,13 +22,6 @@ static inline void usleep(unsigned int usec) {
 #include <unistd.h>   // usleepなど
 #include <termios.h>  // 端末制御
 #include <fcntl.h>    // ファイル制御
-#endif
-
-// 標準ライブラリ
-#include <math.h>      // 数学関数（sin, cosなど）
-#include <stdio.h>     // 標準入出力
-#include <string.h>    // 文字列操作
-#include <stdlib.h>    // メモリ管理
 
 // Unix/Linux用のkbhit関数実装
 static int kbhit(void) {
@@ -55,6 +54,7 @@ static int kbhit(void) {
     }
     return 0;
 }
+#endif
 
 // デフォルト設定値の定義
 #define DEFAULT_WIDTH 160           // 画面の幅
