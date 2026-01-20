@@ -19,7 +19,41 @@ C 言語で実装されたコンソールベースの 3D 回転キューブレ�
 
 ## 🚀 ビルドと実行
 
-### Linux/Unix
+### Makefile を使用したビルド（推奨）
+
+Makefile を使用することで、OS を自動検出し、適切なコンパイラ設定でビルドできます。
+
+```bash
+# ビルド環境の確認
+make check
+
+# プログラムのビルド
+make
+
+# ビルドと実行
+make run
+
+# ヘルプの表示
+make help
+```
+
+#### 利用可能な Makefile ターゲット
+
+| コマンド | 説明 |
+|---------|------|
+| `make` / `make all` | プログラムをビルド（デフォルト） |
+| `make debug` | デバッグシンボル付きでビルド |
+| `make release` | 最適化されたリリース版をビルド |
+| `make clean` | ビルドファイルをクリーンアップ |
+| `make run` | ビルドして実行 |
+| `make install` | システムにインストール（Unix系のみ） |
+| `make uninstall` | システムからアンインストール（Unix系のみ） |
+| `make check` | ビルド環境をチェック |
+| `make help` | 利用可能なターゲットを表示 |
+
+### 手動コンパイル（従来の方法）
+
+#### Linux/Unix
 
 ```bash
 # コンパイル
@@ -29,7 +63,7 @@ gcc -o cube cube.c -lm
 ./cube
 ```
 
-### Windows
+#### Windows
 
 ```bash
 # コンパイル（gcc/MinGW）
@@ -81,6 +115,13 @@ cube.exe
 
 - **Windows**: Windows API を使用して ANSI エスケープシーケンスを有効化
 - **Unix/Linux**: termios と fcntl による非ブロッキング入力を実装
+
+### ビルドシステム
+
+- **Makefile**: クロスプラットフォーム対応のビルドシステム
+- **OS 自動検出**: Linux、macOS、Windows を自動認識
+- **複数ビルド設定**: デバッグ、リリース、標準ビルドに対応
+- **環境チェック**: `make check` でビルド環境を検証
 
 ## 🏗️ コード構造
 
